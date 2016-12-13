@@ -22,7 +22,8 @@ QuickSand is a compact C framework to analyze suspected malware documents to 1) 
 ## Lite Version - Mplv2 License
 
 - Key dictionary up to 256 byte XOR
-- ROL, ROR, NOT
+- Bitwise ROL, ROR, NOT
+- Addition or substraction math cipher
 - Executable extraction: Windows, Mac, Linux, VBA
 - Exploit search
 - RTF pre processing
@@ -33,23 +34,38 @@ QuickSand is a compact C framework to analyze suspected malware documents to 1) 
 - zLib Decode
 - Mime Mso xml Decoding
 - OpenXML decode (unzip)
-- Yara signatures included: Executables, exploits and active content
+- Yara signatures included: Executables, active content, exploits CVE 2014 and earlier
 
 
 ## Full Version - Commercial License
 
-- Key cryptanalysis 1-1024 bytes factors of 2; or a specified odd size
-- 1 Byte zerospace not replaced brute force search
-- XOR Look Ahead
-- Yara signatures included: Executables, most recent exploits and active content
+- Key cryptanalysis 1-1024 bytes factors of 2; or a specified odd size 1-1024 bytes
+- 1 Byte zerospace not replaced brute force XOR search
+- XOR Look Ahead cipher
+- More Yara signatures included: All lite plus most recent exploits 2014-2016 for CVE identification
 - Try the full version online at [QuickSand.io](https://quicksand.io/)
 
 
-## Dependencies
+## Dependencies (not included)
 
 - Yara 3+
 - zlib
 - libzip
+
+
+## Distributed components under their own licensing
+
+- MD5 by RSA Data Security, Inc.
+- SHA1 by Paul E. Jones
+- SHA2 by Aaron D. Gifford 
+- jWrite by TonyWilk for json output
+- tinydir by Cong Xu, Baudouin Feildel for directory processing
+
+
+## Quick Start
+- ./build.sh
+- ./quicksand.out -h
+- ./quicksand.out malware.doc
 
 
 ## Documentation
