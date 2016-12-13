@@ -5,7 +5,7 @@
 
 QuickSand is a compact C framework to analyze suspected malware documents to 1) identify exploits in streams of different encodings, 2) locate and extract embedded executables. By having the ability to locate embedded obfuscated executables, QuickSand could detect documents that contain zero-day or unknown obfuscated exploits.
 
-## File Formats For Exploit and Active Content
+## File Formats For Exploit and Active Content Detection
 
 - doc, docx, rtf, etc
 - ppt, pptx, etc
@@ -45,23 +45,22 @@ QuickSand is a compact C framework to analyze suspected malware documents to 1) 
 - Try the full version online at [QuickSand.io](https://quicksand.io/)
 
 
-# Dependencies
+## Dependencies
 
 - Yara 3+
 - zlib
 - libzip
 
 
-# Documentation
+## Documentation
 
 [QuickSand.io](https://quicksand.io/)
 
 
-# Copyright, License, and Trademark
+## Copyright, License, and Trademark
 
 QuickSand.io and the QuickSand application logo are Copyright 2016 Tyler McLellan  Tylabs. 
 
 quicksand.c, libqs.h and libqs.c are Copyright 2016 Tyler McLellan  Tylabs.
-
 
 See included Mozilla Public License Version 2.0 for licensing information.
