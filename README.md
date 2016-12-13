@@ -7,16 +7,16 @@ QuickSand is a compact C framework to analyze suspected malware documents to 1) 
 
 ## File Formats For Exploit and Active Content Detection
 
-- doc, docx, rtf, etc
-- ppt, pptx, etc
+- doc, docx, docm, rtf, etc
+- ppt, pptx, pps, ppsx, etc
 - xls, xlsx, etc
 - mime mso
-
+- eml email
 
 ## File Formats For Executable Detection
 
 - All of the above, plus PDF.
-- Any document format.
+- Any document format such as HWP.
 
 
 ## Lite Version - Mplv2 License
@@ -59,7 +59,7 @@ QuickSand is a compact C framework to analyze suspected malware documents to 1) 
 
 ## Copyright, License, and Trademark
 
-QuickSand.io and the QuickSand application logo are Copyright 2016 Tyler McLellan  Tylabs. 
+QuickSand.io name and the QuickSand application logo are Copyright 2016 Tyler McLellan  Tylabs. 
 
 quicksand.c, libqs.h and libqs.c are Copyright 2016 Tyler McLellan  Tylabs.
 
