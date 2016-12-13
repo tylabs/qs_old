@@ -51,7 +51,17 @@ QuickSand is a compact C framework to analyze suspected malware documents to 1) 
 - zlib
 - libzip
 
-Documentation
-#############
+
+# Documentation
+
 [QuickSand.io](https://quicksand.io/)
 
+
+# Copyright, License, and Trademark
+
+QuickSand.io and the QuickSand application logo are Copyright 2016 Tyler McLellan  Tylabs. 
+
+quicksand.c, libqs.h and libqs.c are Copyright 2016 Tyler McLellan  Tylabs.
+
+
+See included Mozilla Public License Version 2.0 for licensing information.
