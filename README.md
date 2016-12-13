@@ -75,8 +75,8 @@ QuickSand is a compact C framework to analyze suspected malware documents to 1) 
 
 ## Copyright, License, and Trademark
 
-QuickSand.io name and the QuickSand application logo are Copyright 2016 Tyler McLellan  Tylabs. 
+"QuickSand.io" name and the QuickSand application logo are Copyright 2016 Tyler McLellan and Tylabs and their use requires written permission from the author.
 
-quicksand.c, libqs.h and libqs.c are Copyright 2016 Tyler McLellan  Tylabs.
+Source code quicksand.c, libqs.h, libqs.c and the yara signatures except where noted are Copyright 2016 Tyler McLellan and Tylabs.
 
 See included Mozilla Public License Version 2.0 for licensing information.
