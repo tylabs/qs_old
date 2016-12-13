@@ -21,7 +21,7 @@
 
 //#include <stdio.h>
 
-char *QUICKSAND_VERSION = "01.05.008";
+char *QUICKSAND_VERSION = "01.01.001";
 
 
 #define QUICKSAND_MAX_ITEM 512
