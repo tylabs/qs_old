@@ -2,6 +2,7 @@
  * QuickSand.io - Document malware forensics tool
  *
  * File libqs.c   Dec 10 2016
+ * Original source code available from https://github.com/tylabs/quicksand_lite
  * 
  * Decode and look in streams of Office Documents, RTF, MIME MSO.
  * XOR Database attack up to 256 byte keys to find embedded exe's.
