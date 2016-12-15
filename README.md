@@ -36,6 +36,8 @@ QuickSand is a compact C framework to analyze suspected malware documents to 1) 
 - OpenXML decode (unzip)
 - Yara signatures included: Executables, active content, exploits CVE 2014 and earlier
 
+Example results and more info [blog post](http://blog.malwaretracker.com/2016/12/quicksandio-open-source-version-released.html)
+
 
 ## Full Version - Commercial License
 
