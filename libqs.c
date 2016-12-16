@@ -1908,8 +1908,7 @@ void report_error(
                   int error_level,
                   const char* file_name,
                   int line_number,
-                  const char* message,
-                  void* user_data)
+                  const char* message)
 {
     if (error_level == YARA_ERROR_LEVEL_ERROR)
     {
@@ -2029,7 +2028,7 @@ void quicksand_yara_mem(const unsigned char* data, unsigned long data_len, char 
         printf("error 2\n");
     
   
-    yr_compiler_set_callback(compiler, report_error, NULL);
+    yr_compiler_set_callback(compiler, report_error);
     
     
     //int errors = yr_compiler_add_string(compiler, rule, "quicksand");
