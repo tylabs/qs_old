@@ -51,8 +51,8 @@ Example results and more info [blog post](http://blog.malwaretracker.com/2016/12
 ## Dependencies (not included)
 
 - Yara 3.4+
-- zlib
-- libzip
+- zlib 1.2.1+
+- libzip 1.1.1+
 
 
 ## Distributed components under their own licensing
