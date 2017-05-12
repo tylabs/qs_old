@@ -751,156 +751,73 @@ int base64decode (char *in, size_t inLen, unsigned char *out, size_t *outLen) {
 
 
 
-int inf(FILE *source, FILE *dest)
-{
-    int ret;
-    unsigned have;
-    z_stream strm;
-    unsigned char in[CHUNK];
-    unsigned char out[CHUNK];
+int inf(const unsigned char *src, int srcLen, unsigned char *dst, int dstLen) {
+    z_stream strm  = {0};
+    strm.total_in  = strm.avail_in  = srcLen;
+    strm.total_out = strm.avail_out = dstLen;
+    strm.next_in   = (Bytef *) src;
+    strm.next_out  = (Bytef *) dst;
     
-    /* allocate inflate state */
     strm.zalloc = Z_NULL;
-    strm.zfree = Z_NULL;
+    strm.zfree  = Z_NULL;
     strm.opaque = Z_NULL;
-    strm.avail_in = 0;
-    strm.next_in = Z_NULL;
-    //ret = inflateInit(&strm);
-    ret = inflateInit2(&strm, -MAX_WBITS);
-    if (ret != Z_OK)
-    {
-        printf("could not inflateInit\n");
-        return ret;
+    
+    int err = -1;
+    int ret = -1;
+    
+    err = inflateInit2(&strm, -MAX_WBITS);
+    if (err == Z_OK) {
+        err = inflate(&strm, Z_FINISH);
+        if (err == Z_STREAM_END) {
+            ret = strm.total_out;
+        }
+        else {
+            inflateEnd(&strm);
+            return err;
+        }
+    }
+    else {
+        inflateEnd(&strm);
+        return err;
     }
     
-    /* decompress until deflate stream ends or end of file */
-    do {
-        strm.avail_in = (unsigned int) fread(in, 1, CHUNK, source);
-        if (ferror(source)) {
-            (void)inflateEnd(&strm);
-            return Z_ERRNO;
-        }
-        if (strm.avail_in == 0)
-            break;
-        strm.next_in = in;
-        
-        /* run inflate() on input until output buffer not full */
-        do {
-            strm.avail_out = CHUNK;
-            strm.next_out = out;
-            ret = inflate(&strm, Z_NO_FLUSH);
-            assert(ret != Z_STREAM_ERROR);  /* state not clobbered */
-            switch (ret) {
-                case Z_NEED_DICT:
-                    ret = Z_DATA_ERROR;     /* and fall through */
-                case Z_DATA_ERROR:
-                case Z_MEM_ERROR:
-                    (void)inflateEnd(&strm);
-                    return ret;
-            }
-            have = CHUNK - strm.avail_out;
-            if (fwrite(out, 1, have, dest) != have || ferror(dest)) {
-                (void)inflateEnd(&strm);
-                return Z_ERRNO;
-            }
-        } while (strm.avail_out == 0);
-        
-        /* done when inflate() says it's done */
-    } while (ret != Z_STREAM_END);
-    
-    /* clean up and return */
-    (void)inflateEnd(&strm);
-    return ret == Z_STREAM_END ? Z_OK : Z_DATA_ERROR;
+    inflateEnd(&strm);
+    return ret;
 }
 
-
-int unc(FILE *source, FILE *dest)
-{
-    int ret;
-    unsigned have;
-    z_stream strm;
-    unsigned char in[CHUNK];
-    unsigned char out[CHUNK];
+int unc(const unsigned char *src, int srcLen, unsigned char *dst, int dstLen) {
+    z_stream strm  = {0};
+    strm.total_in  = strm.avail_in  = srcLen;
+    strm.total_out = strm.avail_out = dstLen;
+    strm.next_in   = (Bytef *) src;
+    strm.next_out  = (Bytef *) dst;
     
-    /* allocate inflate state */
     strm.zalloc = Z_NULL;
-    strm.zfree = Z_NULL;
+    strm.zfree  = Z_NULL;
     strm.opaque = Z_NULL;
-    strm.avail_in = 0;
-    strm.next_in = Z_NULL;
-    ret = inflateInit(&strm);
-    //ret = inflateInit2(&strm, -MAX_WBITS);
-    if (ret != Z_OK)
-    {
-        printf("could not inflateInit\n");
-        return ret;
-    }
     
-    /* decompress until deflate stream ends or end of file */
-    do {
-        strm.avail_in = (uint) fread(in,  1, CHUNK, source);
-        if (ferror(source)) {
-            (void)inflateEnd(&strm);
-            return Z_ERRNO;
+    int err = -1;
+    int ret = -1;
+    
+    err = inflateInit(&strm);
+    if (err == Z_OK) {
+        err = inflate(&strm, Z_FINISH);
+        if (err == Z_STREAM_END) {
+            ret = strm.total_out;
         }
-        if (strm.avail_in == 0)
-            break;
-        strm.next_in = in;
-        
-        /* run inflate() on input until output buffer not full */
-        do {
-            strm.avail_out = CHUNK;
-            strm.next_out = out;
-            ret = inflate(&strm, Z_NO_FLUSH);
-            assert(ret != Z_STREAM_ERROR);  /* state not clobbered */
-            switch (ret) {
-                case Z_NEED_DICT:
-                    ret = Z_DATA_ERROR;     /* and fall through */
-                case Z_DATA_ERROR:
-                case Z_MEM_ERROR:
-                    (void)inflateEnd(&strm);
-                    return ret;
-            }
-            have = CHUNK - strm.avail_out;
-            if (fwrite(out, 1, have, dest) != have || ferror(dest)) {
-                (void)inflateEnd(&strm);
-                return Z_ERRNO;
-            }
-        } while (strm.avail_out == 0);
-        
-        /* done when inflate() says it's done */
-    } while (ret != Z_STREAM_END);
-    
-    /* clean up and return */
-    (void)inflateEnd(&strm);
-    return ret == Z_STREAM_END ? Z_OK : Z_DATA_ERROR;
-}
-
-
-void zerr(int ret)
-{
-    fputs("zlib: ", stderr);
-    switch (ret) {
-        case Z_ERRNO:
-            if (ferror(stdin))
-                fputs("error reading stdin\n", stderr);
-            if (ferror(stdout))
-                fputs("error writing stdout\n", stderr);
-            break;
-        case Z_STREAM_ERROR:
-            fputs("invalid compression level\n", stderr);
-            break;
-        case Z_DATA_ERROR:
-            fputs("invalid or incomplete deflate data\n", stderr);
-            break;
-        case Z_MEM_ERROR:
-            fputs("out of memory\n", stderr);
-            break;
-        case Z_VERSION_ERROR:
-            fputs("zlib version mismatch!\n", stderr);
+        else {
+            inflateEnd(&strm);
+            return err;
+        }
     }
+    else {
+        inflateEnd(&strm);
+        return err;
+    }
+    
+    inflateEnd(&strm);
+    return ret;
 }
-
 
 
 unsigned char* quicksand_parse_rtf(const unsigned char *data, unsigned long data_len, unsigned long *new_len)
@@ -912,23 +829,23 @@ unsigned char* quicksand_parse_rtf(const unsigned char *data, unsigned long data
     for (i = 0; i < data_len; i++) {
         
         if (data[i] == '\\') {
-                //store this and next
-                //advance
-                
-                //follow the white rabbit and remove control words
-                j = 0;
-                for (j = i+1; j < data_len; j++){
-                    if (isspace(data[j])) {
-                        break;
-                    } else if ((data[j] == '{' || data[j] == '}') && data[j-1] != '\\' ) {
-                        j--;
-                        break;
-                    }
+            //store this and next
+            //advance
+            
+            //follow the white rabbit and remove control words
+            j = 0;
+            for (j = i+1; j < data_len; j++){
+                if (isspace(data[j])) {
+                    break;
+                } else if ((data[j] == '{' || data[j] == '}') && data[j-1] != '\\' ) {
+                    j--;
+                    break;
                 }
-                i = j;
-                
-                
-                // for {\* ignore non standard control words
+            }
+            i = j;
+            
+            
+            // for {\* ignore non standard control words
         } else if (data[i] == '{' && data[i+1] == '\\' && data[i+2] == '*' ) {
             //follow the white rabbit and remove control words
             if (data[i+1] == '\\') {
@@ -942,38 +859,50 @@ unsigned char* quicksand_parse_rtf(const unsigned char *data, unsigned long data
                 i = j;
             }
         } else if (data[i] == '{' ) {
-                //follow the white rabbit and remove control words
-                if (data[i+1] == '\\') {
-                    j = 0;
-                    for (j = i+2; j < data_len; j++){
-                        if (isspace(data[j])) {
-                            break;
-                        } else if ((data[j] == '{' || data[j] == '}') && data[j-1] != '\\' ) {
-                            j--;
-                            break;
-                        }
+            //follow the white rabbit and remove control words
+            if (data[i+1] == '\\') {
+                j = 0;
+                for (j = i+2; j < data_len; j++){
+                    if (isspace(data[j])) {
+                        break;
+                    } else if ((data[j] == '{' || data[j] == '}') && data[j-1] != '\\' ) {
+                        j--;
+                        break;
                     }
-                    i = j;
-                } 
+                }
+                i = j;
+            }
         } else if (data[i] == '}' ) {
-                //do nothing
-                
+            //do nothing
+            
+        } else if (iscntrl(data[i]) && data[i] != 0x0a && data[i] != 0x09 && data[i] != 0x0d &&  data[i] != '\\' ) {
+            //do nothing
+            j = 0;
+            for (j = i+2; j < data_len; j++){
+                if ((data[j] == '{' || data[j] == '}') && data[j-1] != '\\' ) {
+                    j--;
+                    break;
+                }
+            }
+            i = j;
+            
         } else if (!isgraph(data[i])) {
-                //do nothing
-                
+            //do nothing
+            
         } else {
-                //store this
-                entity[k] = data[i];
-                k++;
+            //store this
+            entity[k] = data[i];
+            k++;
         }
-
-            
-            
+        
+        
+        
     }
     *new_len = k;
     return (entity);
     
 }
+
 
 
 
@@ -1100,7 +1029,7 @@ void quicksand_extract_zlib78(const unsigned char *data, unsigned long data_len,
     int c = 0,k,j,res;
     int locations[KMP_MAX];
     FILE *fp;
-
+    
     unsigned char marker_hex[]= "0000789c";
     
     //check for d0cf11 oleheader
@@ -1127,56 +1056,23 @@ void quicksand_extract_zlib78(const unsigned char *data, unsigned long data_len,
             unsigned char *buffer = malloc(end-locations[k]-3);
             buffer = memcpy(buffer, data+locations[k]+j, end-locations[k]-j); //j is at least 4
             
-            char *file = tempnam(NULL, "qsdata");
-            FILE* fp = fopen(file, "wb");
-            
-            fwrite(buffer, 1, end-locations[k]-j, fp);
-            fclose(fp);
-            fp=fopen(file, "rb");
-            
-            char *file2 = tempnam(NULL, "qsdata");
-            FILE* out = fopen(file2, "wb");
-            
-            res = inf(fp, out);
+            unsigned char *destbuffer  = malloc(QUICKSAND_MAX_EXPAND);
+            res = inf((const unsigned char*)buffer, end-locations[k]-4, destbuffer, QUICKSAND_MAX_EXPAND);
             
             free(buffer);
-            if(res == Z_OK) {
+            if(res > 64) {
                 //printf("deflate worked %d\n", j);
                 //printf("zlib location is %d\n", locations[k]);
                 
-                FILE *f = fopen(file2, "rb"); //file write
-                if( f == NULL )
-                {
-                    perror("Error while opening the file.\n");
-                    exit(1);
-                }
-                
-                
-                fseek(f, 0, SEEK_END);
-                unsigned long fsize = ftell(f);
-                fseek(f, 0, SEEK_SET);
-                
-                
-                unsigned char *string = malloc(fsize + 1);
-                fread(string, fsize, 1, f);
-                fclose(f);
                 
                 char *str = malloc(20);
                 snprintf(str, 20, "%s%d", "zlib@", locations[k]);
                 
-                quicksand_do(string, fsize, quicksand_build_message(str, source->parent, qs_root, QS_FILE_CHILD), qs_root);
-                fclose(fp);
-                fclose(out);
-                unlink(file);
-                unlink(file2);
+                quicksand_do(destbuffer, res, quicksand_build_message(str, source->parent, qs_root, QS_FILE_CHILD), qs_root);
                 
                 continue;
                 
             }
-            fclose(fp);
-            fclose(out);
-            unlink(file);
-            unlink(file2);
         }
         
     }
@@ -1187,15 +1083,15 @@ void quicksand_extract_zlib78(const unsigned char *data, unsigned long data_len,
 
 
 
+
 void quicksand_extract_ExOleObjStgCompressedAtom(const unsigned char *data, unsigned long data_len, const struct qs_message *source, struct qs_file **qs_root)
 {
     unsigned char *marker = malloc(5);
     int c = 0,k,j,res;
     int locations[KMP_MAX];
-    FILE *fp;
     //marker 10001110 ExOleObjStgCompressedAtom
     unsigned char marker_hex[]= "10001110";
-
+    
     //check for d0cf11 oleheader
     if (data_len < 500 || data[0] != 0xD0 || data[1] != 0xCF || data[2] != 0x11)
         return;
@@ -1203,12 +1099,12 @@ void quicksand_extract_ExOleObjStgCompressedAtom(const unsigned char *data, unsi
     //printf("looking for ExOleObjStgCompressedAtom blocks\n");
     hex2str(marker_hex, 8, marker);
     marker[4] = '\0';
-
+    
     
     //find positions of 10001110
     c = KMPSearch(marker, 4, data, (int) data_len, locations);
- 
-    //looop through and decode
+    
+    //loop through and decode
     for(k=0; k < c; k++) {
         //printf("ExOleObjStgCompressedAtom location is %d\n", locations[k]);
         int end = (int) data_len;
@@ -1220,85 +1116,59 @@ void quicksand_extract_ExOleObjStgCompressedAtom(const unsigned char *data, unsi
             unsigned char *buffer = malloc(end-locations[k]-3);
             buffer = memcpy(buffer, data+locations[k]+j, end-locations[k]-j); //j is at least 4
             
-            char *file = tempnam(NULL, "qsdata");
-            FILE* fp = fopen(file, "wb");
-            
-            //fp=fopen("testinflate.bin", "wb"); //file write
-            
-            fwrite(buffer, 1, end-locations[k]-j, fp);
-            fclose(fp);
-            fp=fopen(file, "rb");
-            
-            char *file2 = tempnam(NULL, "qsdata");
-            FILE* out = fopen(file2, "wb");
-
-            //FILE *out = fopen("testdeflate.bin","wb"); //file write
-            res = inf(fp, out);
+            unsigned char *destbuffer  = malloc(QUICKSAND_MAX_EXPAND);
+            res = inf((const unsigned char*)buffer, end-locations[k]-4, destbuffer, QUICKSAND_MAX_EXPAND);
             
             free(buffer);
-            if(res == Z_OK) {
-                //printf("deflate worked\n");
-                //printf("ExOleObjStgCompressedAtom location is %d\n", locations[k]);
+            if(res > 64) {
+                //printf("deflate worked got %d\n", res);
+                //printf("ok ExOleObjStgCompressedAtom location is %d\n", locations[k]);
                 
-                FILE *f = fopen(file2, "rb"); //file write
-                if( f == NULL )
-                {
-                    perror("Error while opening the file.\n");
-                    exit(1);
-                }
-                
-                
-                fseek(f, 0, SEEK_END);
-                unsigned long fsize = ftell(f);
-                fseek(f, 0, SEEK_SET);
-                
-                
-                unsigned char *string = malloc(fsize + 1);
-                fread(string, fsize, 1, f);
-                fclose(f);
                 
                 char *str = malloc(20);
                 snprintf(str, 20, "%s%d", "atom@", locations[k]);
                 
-                quicksand_do(string, fsize, quicksand_build_message(str, source->parent, qs_root, QS_FILE_CHILD), qs_root);
-                fclose(fp);
-                fclose(out);
-                unlink(file);
-                unlink(file2);
-
+                quicksand_do(destbuffer, res, quicksand_build_message(str, source->parent, qs_root, QS_FILE_CHILD), qs_root);
+                
                 continue;
                 
-            }
-            fclose(fp);
-            fclose(out);
-            unlink(file);
-            unlink(file2);
+            } else
+                free(destbuffer);
         }
-                        
+        
     }
-
-    
     free(marker);
 }
 
 
 
-int quicksand_unzip(const char *archive, struct qs_message *source, struct qs_file **qs_root)
+int quicksand_unzip(const unsigned char *data, unsigned long data_len, struct qs_message *source, struct qs_file **qs_root)
 {
     struct zip *za;
     struct zip_file *zf;
     struct zip_stat sb;
     char buf[100];
-    int err;
     int i;
     unsigned long len;
+    struct zip_source *src;
+    struct zip_error error;
     
-
-    if ((za = zip_open(archive, 0, &err)) == NULL) {
-        zip_error_to_str(buf, sizeof(buf), err, errno);
-        //fprintf(stderr, "can't open zip archive `%s': %s\n", archive, buf);
+    zip_error_init(&error);
+    // create source from buffer
+    if ((src = zip_source_buffer_create((void *)data, data_len, 1, &error)) == NULL) {
+        //fprintf(stderr, "can't create source: %s\n", zip_error_strerror(&error));
+        zip_error_fini(&error);
         return 1;
     }
+    //open zip archive from source
+    if ((za = zip_open_from_source(src, 0, &error)) == NULL) {
+        //fprintf(stderr, "can't open zip from source: %s\n", zip_error_strerror(&error));
+        zip_source_free(src);
+        zip_error_fini(&error);
+        return 1;
+    }
+    zip_error_fini(&error);
+    
     
     for (i = 0; i < zip_get_num_entries(za, 0); i++) {
         if (zip_stat_index(za, i, 0, &sb) == 0) {
@@ -1316,8 +1186,6 @@ int quicksand_unzip(const char *archive, struct qs_message *source, struct qs_fi
             
             
             unsigned char * zcontent = malloc(sb.size);
-            
-            
             zip_fread(zf, zcontent, sb.size);
             
             char* str = malloc(261);
@@ -1326,19 +1194,13 @@ int quicksand_unzip(const char *archive, struct qs_message *source, struct qs_fi
             quicksand_do(zcontent, sb.size, quicksand_build_message(str, source->parent, qs_root, QS_FILE_CHILD), qs_root);
             zip_fclose(zf);
             
-            //free(zcontent);
-            
         }
     }
-    
-    
-    if (zip_close(za) == -1) {
-        //fprintf(stderr, "can't close zip archive `%s'\n", archive);
-        return 1;
-    }
+    zip_source_close(src);
     
     return 0;
 }
+
 
 
 
@@ -2153,7 +2015,6 @@ int quicksand_not(const unsigned char *data, unsigned long data_len, struct qs_m
 void quicksand_mime(const unsigned char *data, unsigned long data_len, struct qs_message *source, struct qs_file **qs_root) {
     char* entity = malloc(data_len);
     int i, j=0,k=0,l=0,f=0, res=0;
-    FILE *fp;
     //printf("looking for base64 blocks\n");
     for (i = 0; i < data_len; i++) {
         if (isalnum(data[i]) || data[i] == '+' || data[i] == '/' || data[i] == '=') {
@@ -2183,57 +2044,23 @@ void quicksand_mime(const unsigned char *data, unsigned long data_len, struct qs
                                 //printf("trying gzuncompress at %d\n", l);
                                 unsigned char *buffer = malloc(*sz-l+1);
                                 memcpy(buffer, decoded_mime+l, *sz-l+1);
-                                char *file = tempnam(NULL, "qsdata");
-                                fp = fopen(file, "wb");
-
-                                //fp=fopen("testuncompress.bin", "wb");
+                                unsigned char *destbuffer  = malloc(QUICKSAND_MAX_EXPAND);
+                                res = unc((const unsigned char*)buffer, *sz-l, destbuffer, QUICKSAND_MAX_EXPAND);
                                 
-                                fwrite(buffer, 1, *sz-l, fp);
-                                fclose(fp);
-                                
-                                fp=fopen(file, "rb");
-                                char *file2 = tempnam(NULL, "qsdata");
-                                FILE *out = fopen(file2,"wb");
-                               
-                                res = unc(fp, out);
                                 
                                 free(buffer);
-                                if(res == Z_OK) {
+                                if(res > 64) {
                                     //printf("deflate worked\n");
                                     
-                                    
-                                    FILE *f = fopen(file2, "rb");
-                                    if ( f == NULL )
-                                    {
-                                        perror("Error while opening the file.\n");
-                                        exit(1);
-                                    }
-                                    
-                                    
-                                    fseek(f, 0, SEEK_END);
-                                    long fsize = ftell(f);
-                                    fseek(f, 0, SEEK_SET);
                                     free(decoded_mime);
-                                    
-                                    decoded_mime = malloc(fsize + 1);
-                                    *sz = (size_t) fsize;
-                                    fread(decoded_mime, fsize, 1, f);
-                                    fclose(f);
-                                    
-                                    fclose(fp);
-                                    fclose(out);
-                                    unlink(file);
-                                    unlink(file2);
+                                    decoded_mime = destbuffer;
                                     
                                     continue;
                                     
-                                }
-                                fclose(fp);
-                                fclose(out);
-                                unlink(file);
-                                unlink(file2);
+                                } else
+                                    free(destbuffer);
                             }
-                             
+                            
                         }
                         //printf("detected %lu\n", *sz);
                         //hex2str(entity, j, decoded_mime);
@@ -2271,8 +2098,8 @@ void quicksand_mime(const unsigned char *data, unsigned long data_len, struct qs
                     quicksand_do(decoded_mime, (int) *sz, quicksand_build_message(str, source->parent, qs_root, QS_FILE_CHILD), qs_root);
                     //free(decoded_mime);
                 }
-               
-
+                
+                
             }
             j=0;
             k=0;
@@ -2289,7 +2116,7 @@ void quicksand_mime(const unsigned char *data, unsigned long data_len, struct qs
         if (strstr((char*) decoded_mime, "ActiveMime")) {
             //printf("ActiveMime detected %lu\n", *sz);
         }
-
+        
         //hex2str(entity, j, decoded_mime);
         char *str = malloc(22);
         snprintf(str, 22, "%s%lu", "base64@", data_len-j-k);
@@ -2298,12 +2125,8 @@ void quicksand_mime(const unsigned char *data, unsigned long data_len, struct qs
     }
     free(entity);
 
-    
-    
-    
-    
-
 }
+
 
 //hash data
 
@@ -2609,16 +2432,7 @@ int quicksand_do(const unsigned char *data, unsigned long data_len,  struct qs_m
     if (data[0] == 'P' && data[1] == 'K') {
         //printf("todo handle going through each file in the zip\n");
         
-        char *file = tempnam(NULL, "qsdata");
-        FILE* fp = fopen(file, "wb");
-        
-        fwrite(data, data_len, 1, fp);
-        fclose(fp);
-        
-        quicksand_unzip(file, source, qs_root);
-        unlink(file);
-        
-        
+        quicksand_unzip((const unsigned char *)data, data_len, source, qs_root);
 
     } else {
         #ifdef DEBUG

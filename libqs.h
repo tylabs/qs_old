@@ -1,7 +1,7 @@
-/* Copyright (c) 2016 Tyler McLellan  TyLabs.com
+/* Copyright (c) 2016, 2017 Tyler McLellan  TyLabs.com
  * QuickSand.io - Document malware forensics tool
  *
- * File libqs.h   Dec 10 2016
+ * File libqs.h   May 11 2017
  * Original source code available from https://github.com/tylabs/quicksand_lite
  * 
  * Decode and look in streams of Office Documents, RTF, MIME MSO.
@@ -22,7 +22,7 @@
 
 //#include <stdio.h>
 
-char *QUICKSAND_VERSION = "01.01.001";
+char *QUICKSAND_VERSION = "01.01.002";
 
 
 #define QUICKSAND_MAX_ITEM 512
@@ -34,6 +34,7 @@ char *QUICKSAND_VERSION = "01.01.001";
 #define QUICKSAND_SHA256_SIZE 32
 #define QUICKSAND_SHA512_SIZE 64
 #define QUICKSAND_MAX_DROP 12800000
+#define QUICKSAND_MAX_EXPAND 32000000
 #define QUICKSAND_MALWARE_SCORE 10
 
 
