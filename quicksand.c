@@ -1,7 +1,8 @@
-/* Copyright (c) 2016 Tyler McLellan  TyLabs.com
+/* Copyright (c) 2016, 2017 Tyler McLellan  TyLabs.com
+ * @tylabs
  * QuickSand.io - Document malware forensics tool
  *
- * File quicksand.c   Dec 10 2016
+ * File quicksand.c   May 24 2017
  * Original source code available from https://github.com/tylabs/quicksand_lite
  * 
  * Decode and look in streams of Office Documents, RTF, MIME MSO.
@@ -166,15 +167,15 @@ int main (int argc, char *argv[])
     //printf("getenv(QS) = %s\n", getenv("QS"));
     if (getenv("QS") != NULL) {
         char *expyara = malloc(4096);
-        snprintfcat(expyara, 4096, "%s%s%s", getenv("QS"), "/", QUICKSAND_EXPLOITS_YARA);
+        snprintf(expyara, 4096, "%s%s%s", getenv("QS"), "/", QUICKSAND_EXPLOITS_YARA);
         QUICKSAND_EXPLOITS_YARA = expyara;
         
         char *exeyara = malloc(4096);
-        snprintfcat(exeyara, 4096, "%s%s%s", getenv("QS"), "/", QUICKSAND_EXE_YARA);
+        snprintf(exeyara, 4096, "%s%s%s", getenv("QS"), "/", QUICKSAND_EXE_YARA);
         QUICKSAND_EXE_YARA = exeyara;
 
         char *generalyara = malloc(4096);
-        snprintfcat(generalyara, 4096, "%s%s%s", getenv("QS"), "/", QUICKSAND_GENERAL_YARA);
+        snprintf(generalyara, 4096, "%s%s%s", getenv("QS"), "/", QUICKSAND_GENERAL_YARA);
         QUICKSAND_GENERAL_YARA = generalyara;
 
         if (!file_exists(QUICKSAND_EXPLOITS_YARA) || !file_exists(QUICKSAND_EXE_YARA)) {
@@ -189,7 +190,7 @@ int main (int argc, char *argv[])
     
     if (getenv("QSDIR") != NULL) {
         char *qsdir = malloc(4096);
-        snprintfcat(qsdir, 4096, "%s", getenv("QSDIR"));
+        snprintf(qsdir, 4096, "%s", getenv("QSDIR"));
         QUICKSAND_OUT_DIR = qsdir;
     }
 
@@ -218,14 +219,9 @@ int main (int argc, char *argv[])
         } else if (strstr(argv[i], "-p") || strstr(argv[i], "--out") ) {
             if (i+1 < argc) {
                 
-                DIR* dir = opendir(argv[i+1]);
-                if (dir) {
-                    char *qsdir = malloc(256);
-                    snprintfcat(qsdir, 256, "%s", argv[i+1]);
-                    QUICKSAND_OUT_DIR = qsdir;
-                    closedir(dir);
-                    
-                }
+                char *qsdir = calloc(4096, 1);
+                snprintf(qsdir, 4096, "%s", argv[i+1]);
+                QUICKSAND_OUT_DIR = qsdir;
                 i++;
             }
         

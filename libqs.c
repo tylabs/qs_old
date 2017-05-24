@@ -1,7 +1,8 @@
-/* Copyright (c) 2016 Tyler McLellan  TyLabs.com
+/* Copyright (c) 2016, 2017 Tyler McLellan  TyLabs.com
+ * @tylabs
  * QuickSand.io - Document malware forensics tool
  *
- * File libqs.c   Dec 10 2016
+ * File libqs.c   May 24 2017
  * Original source code available from https://github.com/tylabs/quicksand_lite
  * 
  * Decode and look in streams of Office Documents, RTF, MIME MSO.
@@ -952,17 +953,16 @@ void quicksand_extract_blocks(const unsigned char *data, unsigned long data_len,
 }
 
 
-
 void quicksand_extract_ezip(const unsigned char *data, unsigned long data_len, struct qs_message *source, struct qs_file **qs_root)
 {
     unsigned char* entity = malloc(data_len+1);
     int i, j=0,start=0, noheader=0;
-
+    
     
     //printf("looking for ezip blocks\n");
     if(data_len < 1024)
-        return;
-
+    return;
+    
     for (i = 0; i < 1024; i++) {
         if (data[i] == 0xD0 && data[i+1] == 0xCF && data[i+2] == 0x11) {
             //printf("found docfile header at %d\n",i);
@@ -972,53 +972,51 @@ void quicksand_extract_ezip(const unsigned char *data, unsigned long data_len, s
         }
         
         if (i == 1023)
-            start = 0;
+        start = 0;
     }
     
-    //this section may slow things down - rtf embedded ole docs don't have a d0cf1l3 header
-    
     //if (!noheader) {
-
-        for (i = start; i < data_len; i++) {
-       
-        
-            if (data[i] == 'P' && data[i+1] == 'K' && data[i+2] == 0x03 && data[i+3] == 0x04) {
-            
-                for (j = 0; j < data_len-i-3; j++) {
-                entity[j] = data[i+j];
-                }
-                //printf("Found ezip block in %s at %d of %d bytes\n", source->identifier, i, j);
-                entity[j+1] = '\0';
-                char *str = malloc(20);
-                snprintf(str, 20, "%s%d", "zip@", i);
-                quicksand_do(entity, j, quicksand_build_message(str, source->parent, qs_root, QS_FILE_CHILD), qs_root);
-                break;
     
+    for (i = start; i < data_len; i++) {
+        
+        
+        if (data[i] == 'P' && data[i+1] == 'K' && data[i+2] == 0x03 && data[i+3] == 0x04) {
+            
+            for (j = 0; j < data_len-i-3; j++) {
+                entity[j] = data[i+j];
             }
+            //printf("Found ezip block in %s at %d of %d bytes\n", source->identifier, i, j);
+            entity[j+1] = '\0';
+            char *str = malloc(20);
+            snprintf(str, 20, "%s%d", "zip@", i);
+            quicksand_do(entity, j, quicksand_build_message(str, source->parent, qs_root, QS_FILE_CHILD), qs_root);
+            break;
+            
         }
+    }
     /*} else {
-        for (i = start; i < data_len; i+=512) {
-            
-            
-            if (data[i] == 'P' && data[i+1] == 'K' && data[i+2] == 0x03 && data[i+3] == 0x04) {
-                
-                for (j = 0; j < data_len-i-1; j++) {
-                    entity[j] = data[i+j];
-                }
-                //printf("Found ezip block in %s at %d of %d bytes\n", source->identifier, i, j);
-                entity[j+1] = '\0';
-                char *str = malloc(20);
-                snprintf(str, 20, "%s%d", "zip@", i);
-                quicksand_do(entity, j, quicksand_build_message(str, source->parent, qs_root, QS_FILE_CHILD), qs_root);
-                
-                
-            }
-        }
-       
-        
-        
-        
-    }*/
+     for (i = start; i < data_len; i+=512) {
+     
+     
+     if (data[i] == 'P' && data[i+1] == 'K' && data[i+2] == 0x03 && data[i+3] == 0x04) {
+     
+     for (j = 0; j < data_len-i-1; j++) {
+     entity[j] = data[i+j];
+     }
+     //printf("Found ezip block in %s at %d of %d bytes\n", source->identifier, i, j);
+     entity[j+1] = '\0';
+     char *str = malloc(20);
+     snprintf(str, 20, "%s%d", "zip@", i);
+     quicksand_do(entity, j, quicksand_build_message(str, source->parent, qs_root, QS_FILE_CHILD), qs_root);
+     
+     
+     }
+     }
+     
+     
+     
+     
+     }*/
     //free(entity);
     
 }
@@ -1200,8 +1198,6 @@ int quicksand_unzip(const unsigned char *data, unsigned long data_len, struct qs
     
     return 0;
 }
-
-
 
 
 
