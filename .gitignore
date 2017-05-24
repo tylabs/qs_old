@@ -1,3 +1,5 @@
+*.qsobj
+
 # Object files
 *.o
 *.ko
