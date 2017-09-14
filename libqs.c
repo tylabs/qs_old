@@ -2,7 +2,7 @@
  * @tylabs
  * QuickSand.io - Document malware forensics tool
  *
- * File libqs.c   May 24 2017
+ * File libqs.c   Sep 12 2017
  * Original source code available from https://github.com/tylabs/quicksand_lite
  * 
  * Decode and look in streams of Office Documents, RTF, MIME MSO.
@@ -1776,7 +1776,7 @@ void report_error(
     else
     {
         
-            fprintf(stderr, "%s(%d): warning: %s\n", file_name, line_number, message);
+            //fprintf(stderr, "%s(%d): warning: %s\n", file_name, line_number, message);
     }
 }
 

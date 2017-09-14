@@ -2,7 +2,7 @@
  * @tylabs
  * QuickSand.io - Document malware forensics tool
  *
- * File libqs.h   May 24 2017
+ * File libqs.h   Sep 12 2017
  * Original source code available from https://github.com/tylabs/quicksand_lite
  * 
  * Decode and look in streams of Office Documents, RTF, MIME MSO.
@@ -23,7 +23,7 @@
 
 //#include <stdio.h>
 
-char *QUICKSAND_VERSION = "01.01.003";
+char *QUICKSAND_VERSION = "01.01.004";
 
 
 #define QUICKSAND_MAX_ITEM 512
