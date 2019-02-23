@@ -26,7 +26,9 @@
 
 
 #define QS_MAX_BUFFER 1000000
+#ifndef DEBUG
 #define DEBUG 0
+#endif
 
 
 

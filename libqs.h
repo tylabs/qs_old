@@ -20,11 +20,19 @@
 
 #ifndef ____quicksand__
 #define ____quicksand__
+#endif
 
 //#include <stdio.h>
 
 char *QUICKSAND_VERSION = "01.01.004";
 
+#ifndef TRUE
+#define TRUE 1
+#endif
+
+#ifndef FALSE
+#define FALSE 0
+#endif
 
 #define QUICKSAND_MAX_ITEM 512
 #define QUICKSAND_MAX_ITEM_NAME 512
