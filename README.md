@@ -1,7 +1,7 @@
 
 # QuickSand.io
-<img width=200 height=200 src=https://repo.quicksand.io/quicksand.png>
-<img src="https://quicksand.io/images/quicksand.png" border=0 height=200>
+<img width=200 height=200 src=https://www.tylabs.com/images/Quicksand/Icon_Colour/Quicksand-Icon-Colour.png>
+<img src="https://tylabs.com/images/quicksand.png" border=0 height=200>
 
 QuickSand is a compact C framework to analyze suspected malware documents to 1) identify exploits in streams of different encodings, 2) locate and extract embedded executables. By having the ability to locate embedded obfuscated executables, QuickSand could detect documents that contain zero-day or unknown obfuscated exploits.
 
