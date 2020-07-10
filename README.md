@@ -1,7 +1,7 @@
 
 # QuickSand.io
-<img width=200 height=200 src=https://www.quicksand.io/assets/images/Quicksand/Icon_Colour/Quicksand-Icon-Colour.png>
-<img src="https://www.quicksand.io/assets/images/quicksand.png" border=0 height=200>
+<img width=200 height=200 src=https://quicksand.io/assets/images/Quicksand/Icon_Colour/Quicksand-Icon-Colour.png>
+<img src="https://quicksand.io/assets/images/quicksand.png" border=0 height=200>
 
 For QuickSand Version 2 written in Python with PDF analysis support, see [quicksand.io](https://quicksand.io/).
 
