@@ -81,8 +81,8 @@ Example results and more info [blog post](http://blog.malwaretracker.com/2016/12
 
 ## Copyright, License, and Trademark
 
-"QuickSand.io" name and the QuickSand application logo are Copyright 2016 Tyler McLellan and Tylabs and their use requires written permission from the author.
+QuickSand application logo are Copyright 2016 Tylabs and their use requires written permission from the author.
 
-Source code quicksand.c, libqs.h, libqs.c and the yara signatures except where noted are Copyright 2016 Tyler McLellan and Tylabs.
+Source code quicksand.c, libqs.h, libqs.c and the yara signatures except where noted are Copyright 2016 Tylabs.
 
 See included Mozilla Public License Version 2.0 for licensing information.
